@@ -27,3 +27,4 @@ dist-ssr
 .vercel
 node_modules
 >>>>>>> origin/main
+**/.DS_Store
