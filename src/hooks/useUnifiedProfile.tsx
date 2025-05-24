@@ -351,19 +351,11 @@ export function useUnifiedProfile(
         }));
         return null;
       }
-<<<<<<< HEAD
-    } catch (error: any) {
-      console.error(`[useUnifiedProfile] Error fetching profile for ${pubkey.substring(0, 8)}:`, error);
-      setBatchState(prev => ({
-        ...prev,
-        errors: { ...prev.errors, [pubkey]: error.message || "Unknown error" }
-=======
     } catch (error: unknown) {
       console.error(`[useUnifiedProfile] Error fetching profile for ${pubkey.substring(0, 8)}:`, error);
       setBatchState(prev => ({
         ...prev,
         errors: { ...prev.errors, [pubkey]: error instanceof Error ? error.message : "Unknown error" }
->>>>>>> origin/main
       }));
       return null;
     } finally {
@@ -548,11 +540,7 @@ export function useUnifiedProfile(
     if (mode === 'batch' || mode === 'cache' || service === 'chat') return;
     
     const unsubscribeProfileUpdates = profileAdapter.subscribeToProfileUpdates(
-<<<<<<< HEAD
-      (pubkey: string, profileData: any) => {
-=======
       (pubkey: string, profileData: import('@/lib/services/profile/types').ProfileData) => {
->>>>>>> origin/main
         setSingleState(prev => {
           // Only update if this is for the current profile being viewed
           if (pubkey === prev.pubkeyHex && profileData.metadata) {
@@ -568,11 +556,7 @@ export function useUnifiedProfile(
     );
 
     const unsubscribeLoadingChanges = profileAdapter.subscribeToLoadingStateChanges(
-<<<<<<< HEAD
-      (pubkey: string, loadingState: any) => {
-=======
       (pubkey: string, loadingState: import('@/lib/services/profile/types').ProfileLoadingState) => {
->>>>>>> origin/main
         setSingleState(prev => {
           // Only log if this is for the current profile being viewed
           if (pubkey === prev.pubkeyHex && mode !== 'basic') {
@@ -662,8 +646,4 @@ export function useChatProfile(options?: Omit<UseUnifiedProfileOptions, 'mode' |
  */
 export function useFeedProfile(options?: Omit<UseUnifiedProfileOptions, 'mode'>) {
   return useUnifiedProfile(undefined, { ...options, mode: 'batch' });
-<<<<<<< HEAD
-} 
-=======
 }
->>>>>>> origin/main

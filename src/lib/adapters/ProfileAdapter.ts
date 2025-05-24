@@ -42,20 +42,11 @@ export class ProfileAdapter {
   }
 
   /**
-<<<<<<< HEAD
-   * Refresh profile data
-   * @param npub - Optional npub string
-   * @param currentUserPubkey - Current authenticated user's public key
-   */
-  async refreshProfile(npub?: string, currentUserPubkey?: string): Promise<void> {
-    return this.profileDataService.refreshCompleteProfile(npub, currentUserPubkey);
-=======
    * Refresh profile data (no-op)
    * @deprecated handled via loadProfile or subscriptions
    */
   async refreshProfile(npub?: string, currentUserPubkey?: string): Promise<void> {
     // refreshProfile is deprecated; use loadProfile or automatic subscriptions
->>>>>>> origin/main
   }
 
   /**
@@ -69,31 +60,17 @@ export class ProfileAdapter {
   /**
    * Convert npub to hex pubkey
    * @param npub - npub string
-<<<<<<< HEAD
-   * @returns hex pubkey string
-   */
-  convertNpubToHex(npub: string): string {
-    return this.profileDataService.convertNpubToHex(npub);
-=======
    */
   convertNpubToHex(npub: string): string {
     return getHexFromNpub(npub);
->>>>>>> origin/main
   }
 
   /**
    * Convert hex pubkey to npub
    * @param hexPubkey - hex pubkey string
-<<<<<<< HEAD
-   * @returns npub string
-   */
-  convertHexToNpub(hexPubkey: string): string {
-    return this.profileDataService.convertHexToNpub(hexPubkey);
-=======
    */
   convertHexToNpub(hexPubkey: string): string {
     return getNpubFromHex(hexPubkey);
->>>>>>> origin/main
   }
 
   /**
@@ -285,8 +262,4 @@ export class ProfileAdapter {
 }
 
 // Export a singleton instance
-<<<<<<< HEAD
-export const profileAdapter = new ProfileAdapter(); 
-=======
 export const profileAdapter = new ProfileAdapter();
->>>>>>> origin/main

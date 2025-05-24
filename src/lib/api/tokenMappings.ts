@@ -14,21 +14,8 @@ export interface TokenMapping {
   isStablecoin?: boolean;  // Flag for stablecoins (USDT, USDC, etc.)
 }
 
-<<<<<<< HEAD
 // CoinGecko fallback mappings for specific tokens
 export const tokenMappings: Record<string, TokenMapping> = {
-=======
-// Map of known token IDs to their CoinGecko equivalents
-export const tokenMappings: Record<string, TokenMapping> = {
-  // AlphBanx token
-  "27aa562d592758d73b33ef11ac5b574aea843a3e315a8d1bdef714c3d6a52cd5": {
-    alephiumId: "27aa562d592758d73b33ef11ac5b574aea843a3e315a8d1bdef714c3d6a52cd5",
-    coingeckoId: "alphbanx",
-    symbol: "ABX",
-    name: "AlphBanx",
-    decimals: 18
-  },
->>>>>>> origin/main
   // Native ALPH token
   "ALPH": {
     alephiumId: "ALPH",
@@ -37,7 +24,6 @@ export const tokenMappings: Record<string, TokenMapping> = {
     name: "Alephium",
     decimals: 18
   },
-<<<<<<< HEAD
   // AlphBanx token - https://www.coingecko.com/en/coins/alphbanx
   "27aa562d592758d73b33ef11ac5b574aea843a3e315a8d1bdef714c3d6a52cd5": {
     alephiumId: "27aa562d592758d73b33ef11ac5b574aea843a3e315a8d1bdef714c3d6a52cd5",
@@ -62,9 +48,6 @@ export const tokenMappings: Record<string, TokenMapping> = {
     name: "Ayin",
     decimals: 18
   }
-=======
-  // Add more mappings as needed
->>>>>>> origin/main
 };
 
 /**

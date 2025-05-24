@@ -1,7 +1,6 @@
 import { NodeProvider } from '@alephium/web3';
 import { getTokenMetadata, fetchTokenList, getFallbackTokenData, formatTokenAmount } from './tokenMetadata';
 import { formatNumber } from '@/lib/utils/formatters';
-<<<<<<< HEAD
 import { detectLPToken, getTokenDisplayInfo } from './lpTokenDetection';
 // Removed complex DEX pricing imports - now using simplified Mobula API pricing
 
@@ -129,8 +128,6 @@ class TokenMetadataCache {
 
 // Initialize the token metadata cache
 const tokenMetadataCache = new TokenMetadataCache();
-=======
->>>>>>> origin/main
 
 // Initialize the node provider with the mainnet node
 const nodeProvider = new NodeProvider('https://node.mainnet.alephium.org');
@@ -158,7 +155,6 @@ export const getAddressBalance = async (address: string): Promise<{
 };
 
 /**
-<<<<<<< HEAD
  * Gets transaction history for an address using the Alephium Explorer Backend API
  * Falls back to UTXO-based simplified transactions if Explorer Backend is unavailable
  */
@@ -207,19 +203,6 @@ export const getAddressTransactions = async (address: string, limit = 20) => {
     const response = await nodeProvider.addresses.getAddressesAddressUtxos(address);
     
     // The API returns an object with a 'utxos' property that contains the array we need
-=======
- * Gets transaction history for an address
- * This uses a custom implementation since the direct transaction method is not available
- */
-export const getAddressTransactions = async (address: string, limit = 20) => {
-  try {
-    // For now, we'll fetch UTXOs and use them to construct a simplified transaction history
-    // In a production app, you might want to use the explorer API or build a more sophisticated solution
-    const response = await nodeProvider.addresses.getAddressesAddressUtxos(address);
-    
-    // The API returns an object with a 'utxos' property that contains the array we need
-    // Check if we have the expected structure
->>>>>>> origin/main
     if (!response || !response.utxos || !Array.isArray(response.utxos)) {
       console.warn('Unexpected UTXO response structure:', response);
       return [];
@@ -233,7 +216,6 @@ export const getAddressTransactions = async (address: string, limit = 20) => {
       timestamp: Date.now() - index * 3600000, // Fake timestamps, newest first
       inputs: [{
         address: 'unknown', // We don't know the sender from just UTXOs
-<<<<<<< HEAD
         attoAlphAmount: utxo.amount || '0',
         amount: utxo.amount || '0' // Keep both for compatibility
       }],
@@ -249,18 +231,6 @@ export const getAddressTransactions = async (address: string, limit = 20) => {
     }));
     
     console.log(`[Node API] Fallback: Generated ${simplifiedTxs.length} simplified transactions from UTXOs`);
-=======
-        amount: utxo.amount || '0'
-      }],
-      outputs: [{
-        address: address,
-        amount: utxo.amount || '0'
-      }],
-      // Add tokens information if available
-      tokens: utxo.tokens || []
-    }));
-    
->>>>>>> origin/main
     return simplifiedTxs;
   } catch (error) {
     console.error('Error fetching address transactions:', error);
@@ -299,7 +269,6 @@ export interface EnrichedToken {
   tokenURI?: string;
   imageUrl?: string;
   attributes?: any[];
-<<<<<<< HEAD
   // Pricing properties
   usdValue?: number;
   tokenPrice?: number;
@@ -636,69 +605,17 @@ const fetchMetadataFromURI = async (tokenURI: string) => {
       console.warn(`[NFT Metadata] All gateways failed for IPFS hash ${ipfsHash}. Last error:`, lastError instanceof Error ? lastError.message : String(lastError));
     }
     
-=======
-  // Add the missing properties that are used in TokenList.tsx
-  usdValue?: number;
-  tokenPrice?: number;
-}
-
-/**
- * Checks if a token is likely an NFT based on its properties
- */
-const isLikelyNFT = (token: any) => {
-  // Check for standard NFT properties
-  if (token.standard && ['INFT', 'NFT', 'ERC721', 'ERC1155'].includes(token.standard)) {
-    return true;
-  }
-  
-  // Check for common NFT indicators in the token ID or symbol
-  if ((token.symbol && /NFT|TOKEN|COIN|COLLECTION/i.test(token.symbol)) || 
-      (token.name && /NFT|TOKEN|COIN|COLLECTION/i.test(token.name))) {
-    return true;
-  }
-  
-  // Check if the token appears to be non-fungible based on its amount
-  if (token.amount === "1" || token.amount === 1) {
-    return true;
-  }
-  
-  return false;
-};
-
-/**
- * Fetch basic NFT metadata from token URI if available
- */
-const fetchNFTMetadata = async (tokenURI?: string) => {
-  if (!tokenURI) return null;
-  
-  try {
-    // If token URI is an IPFS link, convert to HTTP gateway
-    const formattedURI = tokenURI.startsWith('ipfs://')
-      ? `https://ipfs.io/ipfs/${tokenURI.substring(7)}`
-      : tokenURI;
-    
-    const response = await fetch(formattedURI);
-    if (!response.ok) throw new Error(`Failed to fetch metadata: ${response.status}`);
-    
-    const metadata = await response.json();
-    return metadata;
-  } catch (error) {
-    console.error('Error fetching NFT metadata:', error);
->>>>>>> origin/main
     return null;
   }
 };
 
 /**
-<<<<<<< HEAD
  * Calculate USD values and token prices using simplified pricing service
  * Primary: Mobula API, Fallback: CoinGecko for specific tokens
  */
 
 
 /**
-=======
->>>>>>> origin/main
  * Gets token balances for an address by checking UTXOs
  * and enriches them with metadata from the token list
  */
@@ -728,7 +645,6 @@ export const getAddressTokens = async (address: string): Promise<EnrichedToken[]
           const tokenId = token.id;
           
           if (!tokenMap[tokenId]) {
-<<<<<<< HEAD
             // STEP 1: Use official SDK to determine token type
             console.log(`[Token Processing] Processing token ${tokenId} using official SDK methods`);
             const nftStatus = await isLikelyNFT(tokenId);
@@ -790,18 +706,10 @@ export const getAddressTokens = async (address: string): Promise<EnrichedToken[]
               }
               console.log(`[Token Processing] Processed image URL for ${tokenId}: ${initialImageUrl}`);
             }
-=======
-            // Get metadata from the token list or use fallback
-            const metadata = tokenMetadataMap[tokenId] || getFallbackTokenData(tokenId);
-            
-            // Check if this token is likely an NFT
-            const nftStatus = isLikelyNFT(metadata);
->>>>>>> origin/main
             
             tokenMap[tokenId] = {
               id: tokenId,
               amount: "0",
-<<<<<<< HEAD
               name: displayInfo.displayName,
               nameOnChain: tokenMetadata.nameOnChain,
               symbol: displayInfo.displaySymbol,
@@ -862,35 +770,6 @@ export const getAddressTokens = async (address: string): Promise<EnrichedToken[]
                 } else {
                   console.warn(`[NFT Processing] Error fetching enhanced metadata for token ${tokenId}:`, errorMessage);
                 }
-=======
-              name: metadata.name,
-              nameOnChain: metadata.nameOnChain,
-              symbol: metadata.symbol || (nftStatus ? 'NFT' : `TOKEN-${tokenId.substring(0, 6)}`),
-              symbolOnChain: metadata.symbolOnChain,
-              decimals: metadata.decimals,
-              logoURI: metadata.logoURI,
-              description: metadata.description,
-              formattedAmount: '',
-              isNFT: nftStatus,
-              tokenURI: metadata.tokenURI || metadata.uri,
-              imageUrl: metadata.image || metadata.imageUrl,
-              // Initialize the new properties with default values
-              usdValue: 0,
-              tokenPrice: 0
-            };
-            
-            // Try to fetch additional NFT metadata if it's an NFT
-            if (nftStatus && (metadata.tokenURI || metadata.uri)) {
-              fetchNFTMetadata(metadata.tokenURI || metadata.uri).then(nftMetadata => {
-                if (nftMetadata && tokenMap[tokenId]) {
-                  tokenMap[tokenId].name = nftMetadata.name || tokenMap[tokenId].name;
-                  tokenMap[tokenId].description = nftMetadata.description || tokenMap[tokenId].description;
-                  tokenMap[tokenId].imageUrl = nftMetadata.image || tokenMap[tokenId].imageUrl;
-                  tokenMap[tokenId].attributes = nftMetadata.attributes;
-                }
-              }).catch(err => {
-                console.error(`Error fetching metadata for token ${tokenId}:`, err);
->>>>>>> origin/main
               });
             }
           }
@@ -901,7 +780,6 @@ export const getAddressTokens = async (address: string): Promise<EnrichedToken[]
       }
     }
     
-<<<<<<< HEAD
     // RACE CONDITION FIX: Remove pricing calculation from here
     // Pricing is now handled by WalletDashboard to prevent concurrent API calls
     console.log("[Token Processing] ✅ Skipping pricing calculation - handled by WalletDashboard");
@@ -913,17 +791,11 @@ export const getAddressTokens = async (address: string): Promise<EnrichedToken[]
       usdValue: undefined,
       tokenPrice: undefined,
       priceSource: undefined,
-=======
-    // Convert the map to an array and format amounts
-    const result = Object.values(tokenMap).map(token => ({
-      ...token,
->>>>>>> origin/main
       formattedAmount: token.isNFT 
         ? token.amount // Don't format NFT amounts (they're usually just "1")
         : formatTokenAmount(token.amount, token.decimals)
     }));
     
-<<<<<<< HEAD
     // Enhanced logging for token classification results
     const nfts = result.filter(token => token.isNFT);
     const lpTokens = result.filter(token => token.isLPToken);
@@ -959,9 +831,6 @@ export const getAddressTokens = async (address: string): Promise<EnrichedToken[]
     }
     
     console.log("Enriched tokens with official SDK methods:", result);
-=======
-    console.log("Enriched tokens with NFT status:", result);
->>>>>>> origin/main
     return result;
   } catch (error) {
     console.error('Error fetching address tokens:', error);
@@ -1368,7 +1237,6 @@ export const fetchLatestTokenTransactions = async (tokenIds: string[], limit: nu
   }
 };
 
-<<<<<<< HEAD
 /**
  * Token cache management functions
  */
@@ -1409,8 +1277,6 @@ export const refreshAllTokenMetadata = async (tokenIds: string[]) => {
   return results;
 };
 
-=======
->>>>>>> origin/main
 export default {
   nodeProvider,
   getAddressBalance,
@@ -1422,7 +1288,6 @@ export default {
   fetchBalanceHistory,
   fetchNetworkStats,
   fetchTokenTransactions,
-<<<<<<< HEAD
   fetchLatestTokenTransactions,
   // Cache management
   clearTokenCache,
@@ -1432,7 +1297,3 @@ export default {
   refreshAllTokenMetadata
 };
 
-=======
-  fetchLatestTokenTransactions
-};
->>>>>>> origin/main
