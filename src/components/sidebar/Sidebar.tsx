@@ -1,14 +1,16 @@
-
 import * as React from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import SidebarNav from "./SidebarNav";
 import { useAuth } from "@/hooks/useAuth";
+import SidebarUserProfile from "./SidebarUserProfile";
+import { useSidebarProfile } from "./useSidebarProfile";
 
 const Sidebar = () => {
   const isMobile = useIsMobile();
   const { isLoggedIn } = useAuth();
+  const sidebarProfile = useSidebarProfile();
   
   return (
     <aside
@@ -38,6 +40,9 @@ const Sidebar = () => {
         </div>
         
         <SidebarNav isLoggedIn={isLoggedIn} />
+        <div className="mt-auto mb-2">
+          <SidebarUserProfile userProfile={sidebarProfile.userProfile} isLoading={typeof sidebarProfile.isLoading === "boolean" ? sidebarProfile.isLoading : false} />
+        </div>
       </div>
     </aside>
   );

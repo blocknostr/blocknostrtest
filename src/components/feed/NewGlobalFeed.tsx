@@ -7,6 +7,8 @@ import { Loader2, AlertCircle, RefreshCw, Wifi, WifiOff } from "lucide-react";
 import { Button } from "../ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useBackgroundRelayConnection } from "@/hooks/useBackgroundRelayConnection";
+import type { NostrEvent } from '@/lib/nostr/types';
+import type { ProfileData } from '../note/NewNoteCard';
 
 interface NewGlobalFeedProps {
   activeHashtag?: string;
@@ -17,8 +19,8 @@ const NewGlobalFeed: React.FC<NewGlobalFeedProps> = ({
   activeHashtag,
   onLoadingChange 
 }) => {
-  const [events, setEvents] = useState<any[]>([]);
-  const [profiles, setProfiles] = useState<Record<string, any>>({});
+  const [events, setEvents] = useState<NostrEvent[]>([]);
+  const [profiles, setProfiles] = useState<Record<string, ProfileData>>({});
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -29,17 +31,15 @@ const NewGlobalFeed: React.FC<NewGlobalFeedProps> = ({
   const { isLoggedIn } = useAuth();
   const relayState = useBackgroundRelayConnection();
 
-  // Default hashtags if none set
-  const defaultGlobalTags = ["bitcoin", "alephium", "ergo"];
-
   // Get the hashtags to filter by - either the active hashtag, user preferences, or default ones
-  const hashtags = useMemo(() => 
-    activeHashtag 
-      ? [activeHashtag] 
-      : (preferences.feedFilters?.globalFeedTags?.length 
-          ? preferences.feedFilters.globalFeedTags 
-          : defaultGlobalTags)
-  , [activeHashtag, preferences.feedFilters?.globalFeedTags]);
+  const hashtags = useMemo(() => {
+    const defaultGlobalTags = ["bitcoin", "alephium", "ergo"];
+    return activeHashtag
+      ? [activeHashtag]
+      : (preferences.feedFilters?.globalFeedTags?.length
+          ? preferences.feedFilters.globalFeedTags
+          : defaultGlobalTags);
+  }, [activeHashtag, preferences.feedFilters?.globalFeedTags]);
 
   // Memoized function to fetch profiles for events
   const fetchProfiles = useCallback(async (pubkeys: string[]) => {
@@ -57,7 +57,7 @@ const NewGlobalFeed: React.FC<NewGlobalFeedProps> = ({
   }, [profiles]);
 
   // Optimized helper to merge new events with existing ones
-  const mergeEvents = useCallback((newEvents: any[], currentEvents: any[]) => {
+  const mergeEvents = useCallback((newEvents: NostrEvent[], currentEvents: NostrEvent[]) => {
     const eventMap = new Map(currentEvents.map(e => [e.id, e]));
     
     newEvents.forEach(newEvent => {
@@ -90,7 +90,7 @@ const NewGlobalFeed: React.FC<NewGlobalFeedProps> = ({
       }));
       
       // Empty array to collect events
-      const collectedEvents: any[] = [];
+      const collectedEvents: NostrEvent[] = [];
       const collectedPubkeys: string[] = [];
       
       // Create subscription
@@ -136,7 +136,7 @@ const NewGlobalFeed: React.FC<NewGlobalFeedProps> = ({
     }
   }, [loadingMore, hasMore, events, hashtags, mergeEvents, fetchProfiles]);
 
-  // Optimized load events function with relay connection awareness
+  // Fix useCallback dependency for loadEvents
   const loadEvents = useCallback(async () => {
     // Don't start loading if we don't have any relay connections
     if (!relayState.readyForFeeds) {
@@ -157,7 +157,7 @@ const NewGlobalFeed: React.FC<NewGlobalFeedProps> = ({
       if (onLoadingChange) onLoadingChange(true);
       
       const wasEmpty = events.length === 0;
-      const collectedEvents: any[] = [];
+      const collectedEvents: NostrEvent[] = [];
       const collectedPubkeys: string[] = [];
       
       // Create hashtag filters
@@ -213,7 +213,7 @@ const NewGlobalFeed: React.FC<NewGlobalFeedProps> = ({
       setLoading(false);
       if (onLoadingChange) onLoadingChange(false);
     }
-  }, [hashtags, fetchProfiles, onLoadingChange, events.length, mergeEvents, relayState]);
+  }, [hashtags, fetchProfiles, onLoadingChange, events, mergeEvents, relayState]);
 
   // Load events on initial render and when hashtags change
   useEffect(() => {
@@ -240,42 +240,31 @@ const NewGlobalFeed: React.FC<NewGlobalFeedProps> = ({
     }
   }, [relayState.readyForFeeds, loadEvents, events.length]);
 
-  // Calculate dynamic height for virtualized feed to match WorldChat bottom
-  // WorldChat is within sidebar that has h-[calc(100vh-3.5rem)] and takes remaining space after search + crypto
+  // Calculate dynamic height for virtualized feed to match viewport and prevent page scroll
   const calculateFeedHeight = () => {
     const viewportHeight = window.innerHeight;
     const headerHeight = 56; // 3.5rem = 56px (sticky header)
-    const searchSectionHeight = 60; // Approximate height for search section in sidebar
-    const cryptoSectionHeight = 160; // Fixed height from GlobalSidebar
-    const sidebarSpacing = 24; // Space between sections and padding in sidebar
-    const contentPadding = 32; // py-4 = 16px top + 16px bottom from NewHomePage
-    
-    // Calculate the actual WorldChat available height within the sidebar
-    const sidebarAvailableHeight = viewportHeight - headerHeight; // h-[calc(100vh-3.5rem)]
-    const worldChatHeight = sidebarAvailableHeight - searchSectionHeight - cryptoSectionHeight - sidebarSpacing;
-    
-    // Feed should match WorldChat height, accounting for main content padding
-    const feedHeight = worldChatHeight - contentPadding;
-    
-    return Math.max(400, Math.min(feedHeight, viewportHeight - headerHeight - contentPadding - 100)); // Add 100px buffer to prevent page scroll
+    const bannerHeight = 64; // Estimate or get actual banner height in px
+    // Adjust these if you have other fixed sections above/below the feed
+    const otherFixedSections = bannerHeight; // e.g., banner, nav, etc.
+    return viewportHeight - headerHeight - otherFixedSections;
   };
 
-  // Update feed height on mount and window resize
   useEffect(() => {
     const updateFeedHeight = () => {
       setFeedHeight(calculateFeedHeight());
+      document.body.style.overflow = 'hidden';
     };
-
-    // Set initial height
     updateFeedHeight();
-
-    // Add resize listener
     window.addEventListener('resize', updateFeedHeight);
-
     return () => {
       window.removeEventListener('resize', updateFeedHeight);
+      document.body.style.overflow = '';
     };
   }, []);
+
+  // Alias for infinite scroll
+  const handleLoadMore = loadMoreEvents;
 
   // Show connecting state when relays are connecting
   if (relayState.isConnecting && events.length === 0) {
@@ -356,7 +345,7 @@ const NewGlobalFeed: React.FC<NewGlobalFeedProps> = ({
         profiles={profiles}
         hasMore={hasMore}
         loadingMore={loadingMore}
-        onLoadMore={loadMoreEvents}
+        onLoadMore={handleLoadMore}
         height={feedHeight}
       />
       

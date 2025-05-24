@@ -7,7 +7,7 @@ import BackButton from "@/components/navigation/BackButton";
 import { useTheme } from "@/hooks/use-theme";
 import { useIsMobile } from "@/hooks/use-mobile";
 import LoginButton from "@/components/LoginButton";
-import HeaderRelayStatus from "@/components/header/HeaderRelayStatus";
+import HeaderRelayStatus from "@/components/Header/HeaderRelayStatus";
 import { useAuth } from "@/hooks/useAuth";
 
 export interface UnifiedPageHeaderProps {
@@ -396,4 +396,4 @@ const UnifiedPageHeader: React.FC<UnifiedPageHeaderProps> = ({
   );
 };
 
-export default UnifiedPageHeader; 
+export default UnifiedPageHeader;

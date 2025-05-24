@@ -377,15 +377,22 @@ html.color-theme-in-transition {
   .react-window-list::-webkit-scrollbar {
     display: none; /* Chrome/Safari/Webkit */
   }
-
-  /* Hide scrollbar completely while keeping scroll functionality */
-  .scrollbar-hide {
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox */
+  
+  /* Hide scrollbars utility class */
+  .scrollbar-none {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE/Edge */
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none !important; /* Chrome/Safari/Webkit */
   }
   
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;  /* Safari and Chrome */
+  /* Ensure the feed area is scrollable and starts below the sticky tab bar */
+  .scrollable-feed {
+    max-height: calc(100vh - 140px - 48px); /* 140px banner + 48px tab bar */
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-top: 48px; /* Height of sticky tab bar */
   }
 }
 
@@ -543,4 +550,25 @@ html.color-theme-in-transition {
 
 .touch-target {
   @apply min-h-[44px] min-w-[44px];
+}
+
+.feed-fixed-height {
+  height: 100vh !important;
+  max-height: 100vh !important;
+}
+
+.bounce-delay-0 {
+  animation-delay: 0s !important;
+  animation-duration: 3s !important;
+}
+.bounce-delay-1 {
+  animation-delay: 1s !important;
+  animation-duration: 3s !important;
+}
+.bounce-delay-2 {
+  animation-delay: 2s !important;
+  animation-duration: 3s !important;
+}
+.bounce-delay-05 {
+  animation-delay: 0.5s !important;
 }

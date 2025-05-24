@@ -1,8 +1,8 @@
-
 import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { nostrService } from "@/lib/nostr";
 import { CheckCircle2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 interface UserProfileProps {
   userProfile: {
@@ -12,13 +12,17 @@ interface UserProfileProps {
     nip05?: string;
     about?: string;
     created_at?: number;
-  };
+  } | null;  // Mark as nullable
   isLoading: boolean;
 }
 
 const SidebarUserProfile = ({ userProfile, isLoading }: UserProfileProps) => {
+  const navigate = useNavigate();
+  const { npub } = useAuth();
+
   // Get user initials for avatar fallback
   const getUserInitials = () => {
+    if (!userProfile) return 'U';
     if (userProfile.display_name || userProfile.name) {
       const name = (userProfile.display_name || userProfile.name || '').trim();
       if (name) {
@@ -28,32 +32,54 @@ const SidebarUserProfile = ({ userProfile, isLoading }: UserProfileProps) => {
     return 'U';
   };
 
-  // Profile pages removed - just show profile info without navigation
   const handleProfileClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    // Could show a simple profile info modal or redirect to settings in the future
+    if (npub) {
+      navigate(`/profile/${npub}`);
+    }
   };
+
+  // If still loading, show loading state
+  if (isLoading) {
+    return (
+      <div 
+        className="flex items-center gap-3 px-2 py-2 rounded-md cursor-wait"
+        aria-label="Loading profile..."
+      >
+        <Avatar>
+          <AvatarFallback className="animate-pulse">U</AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col">
+          <div className="w-20 h-4 bg-muted animate-pulse rounded" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
-      className="flex items-center gap-3 px-2 py-2 rounded-md cursor-default"
+      className="flex items-center gap-3 px-2 py-2 rounded-md cursor-pointer hover:bg-accent"
       aria-label="Your profile info"
+      onClick={handleProfileClick}
     >
       <Avatar>
-        {isLoading ? (
-          <AvatarFallback className="animate-pulse">{getUserInitials()}</AvatarFallback>
-        ) : (
+        {userProfile?.picture ? (
           <>
-            <AvatarImage src={userProfile.picture} alt={userProfile.display_name || userProfile.name || 'User'} />
+            <AvatarImage 
+              src={userProfile.picture} 
+              alt={userProfile.display_name || userProfile.name || 'User'} 
+            />
             <AvatarFallback>{getUserInitials()}</AvatarFallback>
           </>
+        ) : (
+          <AvatarFallback>{getUserInitials()}</AvatarFallback>
         )}
       </Avatar>
       <div className="flex flex-col">
         <span className="font-medium text-sm truncate max-w-[140px]">
-          {userProfile.display_name || userProfile.name || 'User'}
+          {userProfile?.display_name || userProfile?.name || 'User'}
         </span>
-        {userProfile.nip05 && (
+        {userProfile?.nip05 && (
           <span className="text-xs text-muted-foreground truncate max-w-[140px] flex items-center gap-1">
             {userProfile.nip05}
             <CheckCircle2 className="h-3 w-3 text-primary" />

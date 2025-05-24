@@ -5,10 +5,18 @@ import { toast } from "@/lib/utils/toast-replacement";
 import { useNoteCardReplies } from './useNoteCardReplies';
 import { useNoteReactions } from './useNoteReactions';
 import { eventBus, EVENTS } from '@/lib/services/EventBus';
+import { profileAdapter } from "@/lib/adapters/ProfileAdapter";
+
+interface ProfileData {
+  name?: string;
+  display_name?: string;
+  nip05?: string;
+  [key: string]: unknown;
+}
 
 interface UseNoteCardProps {
   event: NostrEvent;
-  profileData?: Record<string, any>;
+  profileData?: ProfileData;
 }
 
 /**
@@ -28,7 +36,7 @@ export function useNoteCard({ event, profileData }: UseNoteCardProps) {
     
     // Format content with proper link/hashtag/mention parsing
     const formatContent = (content: string) => {
-      let formattedContent = content
+      const formattedContent = content
         // URLs
         .replace(
           /(https?:\/\/[^\s]+)/g, 
@@ -37,15 +45,15 @@ export function useNoteCard({ event, profileData }: UseNoteCardProps) {
         // Hashtags
         .replace(
           /#(\w+)/g, 
-          '<a href="javascript:void(0)" class="text-primary hover:underline">#$1</a>'
+          '<a href="/tag/$1" class="text-primary hover:underline">#$1</a>'
         )
         // Mentions
         .replace(
           /@(\w+)/g, 
-          '<a href="javascript:void(0)" class="text-primary hover:underline">@$1</a>'
+          '<a href="/user/$1" class="text-primary hover:underline">@$1</a>'
         );
       
-      return formattedContent;
+      return isExpanded ? formattedContent : formattedContent.slice(0, 280);
     };
     
     // Extract hashtags from event tags
@@ -73,9 +81,29 @@ export function useNoteCard({ event, profileData }: UseNoteCardProps) {
       ? event.content.substring(0, 300) + '...'
       : event.content;
     
+    // Extract media URLs (images, videos, YouTube, Twitter, SoundCloud, etc.) from content
+    const urlRegex = /(https?:\/\/[\w\-._~:/?#[\]@!$&'()*+,;=%]+\.(?:png|jpe?g|gif|webp|mp4|webm|ogg|mov|m4v|avi|svg)|https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/|twitter\.com\/[\w]+\/status\/|soundcloud\.com\/)[^\s]+)/gi;
+    const mediaUrls = (event.content.match(urlRegex) || []);
+    
     // Generate profile URL using adapter pattern
-    const profileUrl = `/`;
-    const postUrl = `/post/${event.id}`;
+    let profileUrl = "/";
+    let pubkey: string | undefined = undefined;
+    if (profileData && typeof profileData.pubkey === "string") {
+      pubkey = profileData.pubkey;
+    } else if (event && typeof event.pubkey === "string") {
+      pubkey = event.pubkey;
+    }
+    if (pubkey) {
+      let npub = pubkey;
+      if (!pubkey.startsWith("npub")) {
+        try {
+          npub = profileAdapter.convertHexToNpub(pubkey);
+        } catch (e) {
+          // ignore conversion error, fallback to raw pubkey
+        }
+      }
+      profileUrl = `/profile/${npub}`;
+    }
     
     return {
       formatContent,
@@ -86,8 +114,9 @@ export function useNoteCard({ event, profileData }: UseNoteCardProps) {
       showFullContent,
       truncatedContent,
       profileUrl,
-      postUrl,
-      formattedContent: formatContent(showFullContent ? event.content : truncatedContent)
+      postUrl: `/post/${event.id}`,
+      formattedContent: formatContent(showFullContent ? event.content : truncatedContent),
+      mediaUrls
     };
   }, [event, profileData, isExpanded]);
   
@@ -146,4 +175,4 @@ export function useNoteCard({ event, profileData }: UseNoteCardProps) {
     // Actions
     ...actions,
   };
-} 
+}

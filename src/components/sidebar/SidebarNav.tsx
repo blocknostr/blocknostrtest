@@ -78,7 +78,8 @@ const SidebarNav = ({ isLoggedIn }: SidebarNavProps) => {
       icon: Settings,
       href: "/settings",
       requiresAuth: false
-    }
+    },
+
   ];
 
   // Create a separate component for the CreateNote button

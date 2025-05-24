@@ -15,6 +15,7 @@ import ArticleEditorPage from '@/pages/articles/ArticleEditorPage';
 import MyArticlesPage from '@/pages/articles/MyArticlesPage';
 import ArticleDraftsPage from '@/pages/articles/ArticleDraftsPage';
 import UnifiedContentViewer from '@/pages/UnifiedContentViewer';
+import ProfilePage from '@/pages/ProfilePage'; // Import the new ProfilePage component
 
 import MainLayout from '@/layouts/MainLayout';
 import { Toaster } from '@/lib/toast';
@@ -59,6 +60,9 @@ const App: React.FC = () => {
                 {/* DAO Routes */}
                 <Route path="dao" element={<DAOPage />} />
                 <Route path="dao/:id" element={<SingleDAOPage />} />
+                
+                {/* Profile Route */}
+                <Route path="profile/:npub" element={<ProfilePage />} />
                 
                 {/* Catch-all redirect */}
                 <Route path="*" element={<Navigate to="/" replace />} />

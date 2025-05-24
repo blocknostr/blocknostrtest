@@ -1,8 +1,7 @@
-
 import * as React from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useProfile } from "@/hooks/useUnifiedProfile";
-import { profileAdapter } from "@/lib/adapters/ProfileAdapter";
+import { useBasicProfile } from "@/hooks/useUnifiedProfile";
+import { nostrService } from "@/lib/nostr";
 
 /**
  * useSidebarProfile Hook - Now uses unified profile hook
@@ -14,7 +13,8 @@ export function useSidebarProfile() {
   const npub = React.useMemo(() => {
     if (!publicKey) return undefined;
     try {
-      return profileAdapter.convertHexToNpub(publicKey);
+      // Use nostrService directly instead of profileAdapter
+      return nostrService.getNpubFromHex(publicKey);
     } catch (error) {
       console.error("[useSidebarProfile] Error converting pubkey to npub:", error);
       return undefined;
@@ -22,15 +22,19 @@ export function useSidebarProfile() {
   }, [publicKey]);
   
   // Use basic profile hook for sidebar
-  const [profileState] = useProfile(npub, { 
+  const [profileState] = useBasicProfile(npub, { 
     enableDebug: false,
     enableRetry: false,
-    autoLoad: isLoggedIn && !!npub
+    autoLoad: !!npub
   });
-  
+
+  // Extract profile and loading flag safely, initialize as null
+  const userProfileData = 'profile' in profileState ? profileState.profile : null;
+  const isLoadingProfile = 'loading' in profileState ? profileState.loading : true;
+
   return { 
     isLoggedIn, 
-    userProfile: (profileState as any).profile || {}, 
-    isLoading: (profileState as any).loading 
+    userProfile: userProfileData, 
+    isLoading: isLoadingProfile 
   };
 }

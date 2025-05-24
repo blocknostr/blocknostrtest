@@ -78,7 +78,14 @@ export const batchFetchWalletData = async (addresses: string[]) => {
     const address = addresses[i];
     
     try {
+<<<<<<< HEAD
             // Add minimal delay between requests (reduced from 500ms to 100ms)      if (i > 0) {        await new Promise(resolve => setTimeout(resolve, 100));      }
+=======
+      // Add small delay between requests
+      if (i > 0) {
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+>>>>>>> origin/main
 
       // Fetch balance and tokens in parallel for each address
       const [balance, tokens] = await Promise.allSettled([
@@ -115,7 +122,18 @@ export const safeRefreshWallet = async (address: string) => {
   try {
     console.log(`[SafeRefresh] Starting refresh for ${address}`);
     
+<<<<<<< HEAD
         // Fetch data sequentially with minimal delays    const balance = await getAddressBalance(address);    await delay(200); // Reduced from 1000ms to 200ms        const tokens = await getAddressTokens(address);    await delay(200); // Reduced from 1000ms to 200ms        const transactions = await getAddressTransactions(address, 10);
+=======
+    // Fetch data sequentially with delays to avoid rate limits
+    const balance = await getAddressBalance(address);
+    await delay(1000); // 1 second delay
+    
+    const tokens = await getAddressTokens(address);
+    await delay(1000); // 1 second delay
+    
+    const transactions = await getAddressTransactions(address, 10);
+>>>>>>> origin/main
     
     console.log(`[SafeRefresh] Completed refresh for ${address}`);
     

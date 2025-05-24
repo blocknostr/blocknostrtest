@@ -1,18 +1,13 @@
-import React, { useCallback, useMemo, useEffect } from 'react';
-import { FixedSizeList as List } from 'react-window';
-import InfiniteLoader from 'react-window-infinite-loader';
+import React from 'react';
 import NewNoteCard from '../note/NewNoteCard';
 import { Loader2 } from 'lucide-react';
-import { usePerformanceMonitor } from '@/lib/utils/performance';
-
-// Import debug utilities in development
-if (process.env.NODE_ENV === 'development') {
-  import('@/lib/utils/performance-debug');
-}
+import type { NostrEvent } from '@/lib/nostr';
+import type { ProfileData } from '../note/NewNoteCard';
+import styles from './VirtualizedFeed.module.css';
 
 interface VirtualizedFeedProps {
-  events: any[];
-  profiles: Record<string, any>;
+  events: NostrEvent[];
+  profiles: Record<string, ProfileData>;
   hasMore: boolean;
   loadingMore: boolean;
   onLoadMore: () => void;
@@ -25,95 +20,56 @@ const VirtualizedFeed: React.FC<VirtualizedFeedProps> = ({
   hasMore,
   loadingMore,
   onLoadMore,
-  height = 600
+  height,
 }) => {
-  // Track performance
-  const performanceTracker = usePerformanceMonitor('VirtualizedFeed');
+  // Infinite scroll: load more when scrolled near bottom
+  const feedRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (!feedRef.current) return;
+      const { scrollTop, scrollHeight, clientHeight } = feedRef.current;
+      if (scrollHeight - scrollTop - clientHeight < 400 && hasMore && !loadingMore) {
+        onLoadMore();
+      }
+    };
+    const node = feedRef.current;
+    if (node) node.addEventListener('scroll', handleScroll);
+    return () => {
+      if (node) node.removeEventListener('scroll', handleScroll);
+    };
+  }, [hasMore, loadingMore, onLoadMore]);
 
-  // Track performance when component mounts and events change
-  useEffect(() => {
-    performanceTracker.trackDOMNodes();
-    performanceTracker.trackMemory();
-    performanceTracker.trackImageLoading();
-    
-    // Log performance every 10 seconds in development
-    if (process.env.NODE_ENV === 'development') {
-      const interval = setInterval(() => {
-        performanceTracker.logPerformance();
-      }, 10000);
-      
-      return () => clearInterval(interval);
-    }
-  }, [events.length, performanceTracker]);
-
-  // Calculate if an item is loaded
-  const isItemLoaded = useCallback((index: number) => {
-    return !!events[index];
-  }, [events]);
-
-  // Item count for infinite loader
-  const itemCount = hasMore ? events.length + 1 : events.length;
-
-  // Simple row renderer - Twitter-style stacked layout with constrained height
-  const Row = useCallback(({ index, style }: { index: number; style: React.CSSProperties }) => {
-    const event = events[index];
-    
-    // Loading indicator for the last item when loading more
-    if (!event) {
-      return (
-        <div style={style} className="flex items-center justify-center py-8">
-          <div className="flex items-center text-sm text-muted-foreground">
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Loading more posts...
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div style={style} className="border-b border-border/50 last:border-b-0">
-        <div className="px-4 py-1 h-full overflow-hidden">
-          <div className="h-[268px] overflow-hidden">
-            <NewNoteCard 
-              event={event}
-              profileData={profiles[event.pubkey]}
-              className="border-0 shadow-none bg-transparent hover:bg-muted/30 h-full"
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }, [events, profiles]);
-
-  // Memoize the list component
-  const VirtualList = useMemo(() => (
-    <InfiniteLoader
-      isItemLoaded={isItemLoaded}
-      itemCount={itemCount}
-      loadMoreItems={onLoadMore}
-      threshold={5}
-    >
-      {({ onItemsRendered, ref }) => (
-        <List
-          ref={ref}
-          height={height}
-          itemCount={itemCount}
-          itemSize={280} // Reduced height due to minimal spacing
-          onItemsRendered={onItemsRendered}
-          overscanCount={2}
-          className="react-window-list"
-        >
-          {Row}
-        </List>
-      )}
-    </InfiniteLoader>
-  ), [isItemLoaded, itemCount, onLoadMore, height, Row]);
+  // Utility to map height to a class
+  function getHeightClass(height?: number) {
+    if (!height) return '';
+    if (height >= window.innerHeight - 10) return styles.height100vh;
+    if (height >= 900) return styles.height900;
+    if (height >= 800) return styles.height800;
+    if (height >= 700) return styles.height700;
+    return styles.height600;
+  }
 
   return (
-    <div className="w-full">
-      {VirtualList}
+    <div
+      ref={feedRef}
+      className={styles.virtualizedFeed + (height ? ' ' + getHeightClass(height) : '')}
+      data-testid="virtualized-feed"
+    >
+      {events.map((event) => (
+        <NewNoteCard
+          key={event.id}
+          event={event}
+          profileData={profiles[event.pubkey]}
+          className="bg-card border border-border shadow-sm hover:bg-muted/10 transition-colors duration-150"
+        />
+      ))}
+      {loadingMore && (
+        <div className="flex justify-center py-6">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        </div>
+      )}
     </div>
   );
 };
 
-export default React.memo(VirtualizedFeed); 
+export default React.memo(VirtualizedFeed);

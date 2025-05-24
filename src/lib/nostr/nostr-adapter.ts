@@ -412,6 +412,18 @@ export class NostrAdapter extends BaseAdapter {
     return this.dataAdapter.getEventsByAuthor(pubkey);
   }
 
+<<<<<<< HEAD
+=======
+  /**
+   * Query events based on filters
+   * @param filters Array of filter objects according to NIP-01
+   * @returns Promise resolving to array of events
+   */
+  async queryEvents(filters: import('./types').NostrFilter[]): Promise<import('./types').NostrEvent[]> {
+    return this.dataAdapter.queryEvents(filters);
+  }
+
+>>>>>>> origin/main
   // Community methods (now in SocialAdapter)
   async createCommunity(name: string, description: string) {
     return this.socialAdapter.createCommunity(name, description);

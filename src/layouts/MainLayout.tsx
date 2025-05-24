@@ -13,7 +13,7 @@ import LoginDialog from '@/components/auth/LoginDialog';
 import { Button } from "@/components/ui/button";
 import { Lightbulb } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
-import HeaderRelayStatus from "@/components/header/HeaderRelayStatus";
+import HeaderRelayStatus from "@/components/Header/HeaderRelayStatus";
 import LoginButton from "@/components/LoginButton";
 import { nostrService } from "@/lib/nostr";
 

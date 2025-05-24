@@ -158,9 +158,15 @@ export const useTokenData = (trackedWallets: string[] = [], refreshInterval = 5 
                 } else {
                   // Fallback for unmapped tokens - use ALPH price as reference with reduced multiplier
                   // This is a rough estimate for tokens without market data
+<<<<<<< HEAD
                               usdValue = 0;
             priceSource = 'estimate';
             console.log(`No price data available for ${token.symbol || tokenId}: setting value to $0`);
+=======
+                  usdValue = tokenAmountNormalized * alphPrice * 0.01;
+                  priceSource = 'estimate';
+                  console.log(`Using estimated price for ${token.symbol || tokenId}: ${alphPrice * 0.01}`);
+>>>>>>> origin/main
                 }
               }
               
@@ -217,7 +223,11 @@ export const useTokenData = (trackedWallets: string[] = [], refreshInterval = 5 
                       currentToken.priceSource = 'market';
                     } else {
                       // Fallback for tokens without market data
+<<<<<<< HEAD
                       currentToken.usdValue = 0;
+=======
+                      currentToken.usdValue = tokenAmountInUnits * alphPrice * 0.01;
+>>>>>>> origin/main
                       currentToken.priceSource = 'estimate';
                     }
                   }
