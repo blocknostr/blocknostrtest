@@ -412,8 +412,6 @@ export class NostrAdapter extends BaseAdapter {
     return this.dataAdapter.getEventsByAuthor(pubkey);
   }
 
-<<<<<<< HEAD
-=======
   /**
    * Query events based on filters
    * @param filters Array of filter objects according to NIP-01
@@ -423,7 +421,6 @@ export class NostrAdapter extends BaseAdapter {
     return this.dataAdapter.queryEvents(filters);
   }
 
->>>>>>> origin/main
   // Community methods (now in SocialAdapter)
   async createCommunity(name: string, description: string) {
     return this.socialAdapter.createCommunity(name, description);

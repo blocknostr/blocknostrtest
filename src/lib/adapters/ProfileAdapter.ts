@@ -1,11 +1,8 @@
 import { ProfileDataService, ProfileLoadResult } from '@/lib/services/ProfileDataService';
 import { ProfileData } from '@/lib/services/profile/types';
 import { verifyNip05, isValidNip05Format, fetchNip05Data, discoverNip05Relays } from '@/lib/nostr/utils/nip/nip05';
-<<<<<<< HEAD
-=======
 import { nostrService } from "@/lib/nostr";
 import { getNpubFromHex, getHexFromNpub } from '@/lib/nostr';
->>>>>>> origin/main
 
 export interface ProfileMetadata {
   name?: string;

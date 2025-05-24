@@ -122,21 +122,12 @@ const NewHomePage: React.FC = () => {
 
       {/* Fun promotional banner for logged-in users */}
       {isLoggedIn && (
-<<<<<<< HEAD
-        <div className="mb-8 p-6 rounded-xl bg-gradient-to-r from-violet-500/10 via-orange-500/10 to-emerald-500/10 border border-violet-500/20 shadow-lg relative overflow-hidden group hover:shadow-xl transition-all duration-300 h-[140px]">
-          {/* Animated background pattern */}
-          <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 via-orange-500/5 to-emerald-500/5 animate-pulse" />
-          <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-violet-500/20 to-transparent rounded-full animate-bounce" style={{ animationDelay: '0s', animationDuration: '3s' }} />
-          <div className="absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-tl from-orange-500/20 to-transparent rounded-full animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }} />
-          <div className="absolute top-1/2 left-1/3 w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-transparent rounded-full animate-bounce" style={{ animationDelay: '2s', animationDuration: '3s' }} />
-=======
         <div className="mb-0 p-6 rounded-xl bg-gradient-to-r from-violet-500/10 via-orange-500/10 to-emerald-500/10 border border-violet-500/20 shadow-lg relative overflow-hidden group hover:shadow-xl transition-all duration-300 h-[140px] sticky top-0 z-40">
           {/* Animated background pattern */}
           <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 via-orange-500/5 to-emerald-500/5 animate-pulse" />
           <div className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-violet-500/20 to-transparent rounded-full animate-bounce bounce-delay-0" />
           <div className="absolute bottom-0 right-0 w-16 h-16 bg-gradient-to-tl from-orange-500/20 to-transparent rounded-full animate-bounce bounce-delay-1" />
           <div className="absolute top-1/2 left-1/3 w-12 h-12 bg-gradient-to-br from-emerald-500/20 to-transparent rounded-full animate-bounce bounce-delay-2" />
->>>>>>> origin/main
           
           <div className="relative flex items-center justify-between h-full">
             {/* Left side - rotating icons */}
@@ -167,11 +158,7 @@ const NewHomePage: React.FC = () => {
                 <p className="text-sm text-muted-foreground">
                   <span className="inline-block animate-bounce">⚡</span>
                   <span className="mx-1">Nost. Bitcoin. Altcoins.</span>
-<<<<<<< HEAD
-                  <span className="inline-block animate-bounce" style={{ animationDelay: '0.5s' }}>⚡</span>
-=======
                   <span className="inline-block animate-bounce bounce-delay-05">⚡</span>
->>>>>>> origin/main
                 </p>
               </div>
             </div>
@@ -189,29 +176,17 @@ const NewHomePage: React.FC = () => {
           </div>
         </div>
       )}
-<<<<<<< HEAD
-
-      {/* Tabs for switching between feeds */}
-      <div className="mb-6 w-full">
-        <div className="flex items-center justify-between mb-4">
-=======
       {/* Feed content with sticky tab bar inside Tabs */}
       <div className="w-full">
         <div className="mb-6 w-full">
->>>>>>> origin/main
           <Tabs
             value={activeTab}
             onValueChange={handleTabChange}
             className="w-full"
           >
-<<<<<<< HEAD
-            <div className="flex items-center justify-between">
-              <TabsList className="w-full">
-=======
             {/* Sticky TabsList directly inside Tabs, outside of feed content */}
             <div className="sticky top-[140px] z-30 bg-background w-full h-12 flex items-center">
               <TabsList className="w-full h-12 flex items-center">
->>>>>>> origin/main
                 <Button 
                   variant="ghost" 
                   size="icon"
@@ -226,67 +201,6 @@ const NewHomePage: React.FC = () => {
               </TabsList>
             </div>
 
-<<<<<<< HEAD
-            {activeHashtag && (
-              <div className="mt-3 flex items-center">
-                <div className="text-sm text-muted-foreground">
-                  Showing posts with <span className="font-medium">#{activeHashtag}</span>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={clearHashtag}
-                  className="text-xs h-6 ml-2"
-                >
-                  Clear filter
-                </Button>
-              </div>
-            )}
-
-            {/* Feed content */}
-            <TabsContent 
-              value="global" 
-              className="mt-4 p-0 border-none w-full" 
-              style={{ overscrollBehavior: 'contain' }}
-            >
-              <NewGlobalFeed 
-                activeHashtag={activeHashtag} 
-                onLoadingChange={handleLoadingChange} 
-              />
-            </TabsContent>
-            
-            <TabsContent 
-              value="following" 
-              className="mt-4 p-0 border-none w-full"
-              style={{ overscrollBehavior: 'contain' }}
-            >
-              {isLoggedIn ? (
-                <NewFollowingFeed 
-                  activeHashtag={activeHashtag}
-                  onLoadingChange={handleLoadingChange}
-                />
-              ) : (
-                <div className="py-12 text-center">
-                  <p className="text-muted-foreground">
-                    Connect your wallet to see posts from people you follow
-                  </p>
-                </div>
-              )}
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-
-      {/* Customize Global Feed Dialog */}
-      <CustomizeGlobalFeedDialog 
-        open={isCustomizeOpen}
-        onOpenChange={setIsCustomizeOpen}
-        defaultHashtags={preferences.feedFilters?.globalFeedTags || []}
-        onSave={(hashtags) => {
-          updateNestedPreference('feedFilters', 'globalFeedTags', hashtags);
-        }}
-      />
-=======
             {/* Scrollable feed content below sticky bar */}
             <div className={`w-full scrollable-feed ${isLoggedIn ? 'pt-[188px]' : 'pt-[48px]'}`}>
               {activeHashtag && (
@@ -346,7 +260,6 @@ const NewHomePage: React.FC = () => {
           }}
         />
       </div>
->>>>>>> origin/main
     </div>
   );
 };

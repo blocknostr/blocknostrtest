@@ -220,21 +220,13 @@ export function useUnifiedProfile(
         error: null
       }));
 
-<<<<<<< HEAD
-    } catch (error: any) {
-=======
     } catch (error: unknown) {
->>>>>>> origin/main
       if (abortControllerRef.current?.signal.aborted) {
         if (mode !== 'basic') addDebugInfo('Request aborted by user');
         return;
       }
 
-<<<<<<< HEAD
-      const errorMessage = error.message || 'Failed to load profile';
-=======
       const errorMessage = error instanceof Error ? error.message : 'Failed to load profile';
->>>>>>> origin/main
       if (mode !== 'basic') addDebugInfo(`Error: ${errorMessage}`);
       console.error('[useUnifiedProfile] Error loading profile:', error);
 

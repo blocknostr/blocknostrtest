@@ -1,25 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useWallet } from "@alephium/web3-react";
-<<<<<<< HEAD
 import { Wallet, ExternalLink, Blocks, LayoutGrid, ChartLine, Database } from "lucide-react";
-=======
-import { Wallet, ExternalLink, Blocks, LayoutGrid, ChartLine, Database, RefreshCw } from "lucide-react";
-import WalletConnectButton from "@/components/wallet/WalletConnectButton";
->>>>>>> origin/main
 import { Card, CardContent, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/lib/utils/toast-replacement";
 import AddressDisplay from "@/components/wallet/AddressDisplay";
 import WalletManager from "@/components/wallet/WalletManager";
-<<<<<<< HEAD
 
 import { getAddressTransactions, getAddressTokens } from "@/lib/api/cachedAlephiumApi";
 import { clearTokenCache } from "@/lib/api/alephiumApi";
-=======
-import FloatingDebugPanel from "@/components/wallet/DebugPanel";
-import { getAddressTransactions, getAddressTokens } from "@/lib/api/cachedAlephiumApi";
->>>>>>> origin/main
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useWalletCache } from "@/hooks/useWalletCache";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -45,33 +35,16 @@ const WalletsPage = () => {
     savedWallets,
     addWallet,
     removeWallet,
-<<<<<<< HEAD
     updateWallet,
-=======
->>>>>>> origin/main
     markAsRefreshed,
     isWalletStale,
     refreshStaleWallets,
     forceRefreshWallet,
-<<<<<<< HEAD
     isOnline
-=======
-    getCacheStatus,
-    cleanupCache,
-    cacheConfig,
-    updateCacheConfig,
-    isOnline,
-    getRateLimitInfo
->>>>>>> origin/main
   } = useWalletCache();
   
   const [walletAddress, setWalletAddress] = useLocalStorage<string>("blocknoster_selected_wallet", "");
   const [refreshFlag, setRefreshFlag] = useState<number>(0);
-<<<<<<< HEAD
-
-=======
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
->>>>>>> origin/main
   const [walletStats, setWalletStats] = useState<WalletStats>({
     transactionCount: 0,
     receivedAmount: 0,
@@ -96,13 +69,8 @@ const WalletsPage = () => {
 
     // Fix existing wallets that don't have network property set correctly
     const walletsToFix = savedWallets.filter(w => 
-<<<<<<< HEAD
       (w.label === "Connected Wallet" && (!w.network || w.network === "")) ||
       (!w.network || w.network === "")
-=======
-      (w.label === "Connected Wallet" && !w.network) ||
-      !w.network
->>>>>>> origin/main
     );
     
     if (walletsToFix.length > 0) {
@@ -230,20 +198,8 @@ const WalletsPage = () => {
           getAddressTokens(walletAddress)
         ]);
         
-<<<<<<< HEAD
         let transactionData: any[] = [];
         let tokenData: any[] = [];
-=======
-        type Transaction = {
-          inputs: { address: string; amount: string }[];
-          outputs: { address: string; amount: string }[];
-          // Add other properties as needed
-        };
-        type Token = object; // Define token properties as needed
-
-        let transactionData: Transaction[] = [];
-        let tokenData: Token[] = [];
->>>>>>> origin/main
         
         if (transactions.status === 'fulfilled') {
           transactionData = transactions.value || [];
@@ -284,7 +240,6 @@ const WalletsPage = () => {
         // Mark wallet as refreshed since we got data (even if partial)
         markAsRefreshed(walletAddress, true);
         
-<<<<<<< HEAD
       } catch (error: any) {
         console.error("[WalletsPage] Error fetching wallet stats:", error.message);
         
@@ -295,22 +250,6 @@ const WalletsPage = () => {
           });
         }
         
-=======
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          console.error("[WalletsPage] Error fetching wallet stats:", error.message);
-
-          // Handle rate limiting gracefully
-          if (error.message?.includes('Rate limited')) {
-            toast.error("Rate limited - using cached data", {
-              description: "Please wait before refreshing again"
-            });
-          }
-        } else {
-          console.error("[WalletsPage] Error fetching wallet stats:", error);
-        }
-
->>>>>>> origin/main
         // Mark as failed refresh
         markAsRefreshed(walletAddress, false);
       } finally {
@@ -321,24 +260,10 @@ const WalletsPage = () => {
     fetchWalletStats();
   }, [walletAddress, refreshFlag, selectedWalletType]);
 
-<<<<<<< HEAD
   const handleDisconnect = async () => {
     try {
       if (wallet.signer && (wallet.signer as any).requestDisconnect) {
         await (wallet.signer as any).requestDisconnect();
-=======
-  // Define an interface for a signer that supports requestDisconnect
-  interface DisconnectableSigner {
-    requestDisconnect: () => Promise<void>;
-    // Add other methods if needed
-  }
-
-  const handleDisconnect = async () => {
-    try {
-      const signer = wallet.signer as unknown as DisconnectableSigner | undefined;
-      if (signer && typeof signer.requestDisconnect === "function") {
-        await signer.requestDisconnect();
->>>>>>> origin/main
         toast.info("Wallet disconnected");
       } else {
         toast.error("Wallet disconnection failed", {
@@ -358,7 +283,6 @@ const WalletsPage = () => {
       });
     }
   };
-<<<<<<< HEAD
 
   
   // Helper to determine if transaction is incoming or outgoing (memoized)
@@ -368,57 +292,12 @@ const WalletsPage = () => {
     // If any input is from this address, it's outgoing
     const isOutgoing = tx.inputs.some((input: any) => input.address === walletAddress);
     
-=======
-  
-  // Handle manual refresh with cache system
-  const handleRefreshWallet = async () => {
-    if (!walletAddress) return;
-    
-    setIsRefreshing(true);
-    try {
-      const success = await forceRefreshWallet(walletAddress);
-      if (success) {
-        setRefreshFlag(prev => prev + 1); // Trigger re-fetch
-      }
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  // Handle refresh all stale wallets
-  const handleRefreshStale = async () => {
-    setIsRefreshing(true);
-    try {
-      await refreshStaleWallets();
-      setRefreshFlag(prev => prev + 1); // Trigger re-fetch
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-  
-  // Define a type for transaction inputs and outputs
-  type TransactionIO = { address: string; amount: string };
-  type TransactionType = {
-    inputs: TransactionIO[];
-    outputs: TransactionIO[];
-    // Add other properties as needed
-  };
-
-  // Helper to determine if transaction is incoming or outgoing (memoized)
-  const getTransactionType = useCallback((tx: TransactionType) => {
-    // If any output is to this address, it's incoming
-    const isIncoming = tx.outputs.some((output) => output.address === walletAddress);
-    // If any input is from this address, it's outgoing
-    const isOutgoing = tx.inputs.some((input) => input.address === walletAddress);
-
->>>>>>> origin/main
     if (isIncoming && !isOutgoing) return 'received';
     if (isOutgoing) return 'sent';
     return 'unknown';
   }, [walletAddress]);
   
   // Calculate amount transferred to/from this address (memoized)
-<<<<<<< HEAD
   const getTransactionAmount = useCallback((tx: any) => {
     const type = getTransactionType(tx);
     
@@ -427,33 +306,15 @@ const WalletsPage = () => {
       const amount = tx.outputs
         .filter((output: any) => output.address === walletAddress)
         .reduce((sum: number, output: any) => sum + Number(output.amount), 0);
-=======
-  const getTransactionAmount = useCallback((tx: TransactionType) => {
-    const type = getTransactionType(tx);
-
-    if (type === 'received') {
-      // Sum all outputs to this address
-      const amount = tx.outputs
-        .filter((output: TransactionIO) => output.address === walletAddress)
-        .reduce((sum: number, output: TransactionIO) => sum + Number(output.amount), 0);
->>>>>>> origin/main
       return amount / 10**18; // Convert from nanoALPH to ALPH
     } else if (type === 'sent') {
       // This is a simplification - for accurate accounting we'd need to track change outputs
       const amount = tx.outputs
-<<<<<<< HEAD
         .filter((output: any) => output.address !== walletAddress)
         .reduce((sum: number, output: any) => sum + Number(output.amount), 0);
       return amount / 10**18; // Convert from nanoALPH to ALPH
     }
     
-=======
-        .filter((output: TransactionIO) => output.address !== walletAddress)
-        .reduce((sum: number, output: TransactionIO) => sum + Number(output.amount), 0);
-      return amount / 10**18; // Convert from nanoALPH to ALPH
-    }
-
->>>>>>> origin/main
     return 0;
   }, [walletAddress, getTransactionType]);
 
@@ -467,13 +328,6 @@ const WalletsPage = () => {
             Connect your wallet to track balances, view transactions, send crypto, and interact with dApps.
           </p>
           
-<<<<<<< HEAD
-
-=======
-          <div className="w-full max-w-md my-8">
-            <WalletConnectButton />
-          </div>
->>>>>>> origin/main
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-lg mt-8">
             <div className="p-4 border rounded-lg bg-card">
@@ -534,24 +388,6 @@ const WalletsPage = () => {
           </div>
           
           <div className="flex gap-2">
-<<<<<<< HEAD
-=======
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleRefreshWallet}
-              disabled={isRefreshing || !isOnline}
-              className="h-9"
-            >
-              {isRefreshing ? (
-                <RefreshCw className="h-4 w-4 animate-spin" />
-              ) : (
-                "Refresh"
-              )}
-            </Button>
-            <WalletConnectButton />
-            
->>>>>>> origin/main
             {connected && (
               <Button variant="outline" size="sm" onClick={handleDisconnect} className="h-9">
                 Disconnect Wallet
@@ -560,7 +396,6 @@ const WalletsPage = () => {
           </div>
         </div>
 
-<<<<<<< HEAD
         <div className="w-full">
           {selectedWalletType === "Alephium" && (
             <Tabs defaultValue="portfolio" value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -616,76 +451,6 @@ const WalletsPage = () => {
       </div>
       
 
-=======
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2">
-            {selectedWalletType === "Alephium" && (
-              <Tabs defaultValue="portfolio" value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid grid-cols-3 max-w-md mb-6">
-                  <TabsTrigger value="portfolio" className="flex items-center gap-2">
-                    <ChartLine className="h-4 w-4" />
-                    <span>My Portfolio</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="dapps" className="flex items-center gap-2">
-                    <LayoutGrid className="h-4 w-4" />
-                    <span>My dApps</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="alephium" className="flex items-center gap-2">
-                    <Blocks className="h-4 w-4" />
-                    <span>My Alephium</span>
-                  </TabsTrigger>
-                </TabsList>
-
-                <AlephiumWalletLayout
-                  address={walletAddress}
-                  allWallets={savedWallets}
-                  isLoggedIn={connected}
-                  walletStats={walletStats}
-                  isStatsLoading={isStatsLoading}
-                  refreshFlag={refreshFlag}
-                  setRefreshFlag={setRefreshFlag}
-                  activeTab={activeTab}
-                />
-              </Tabs>
-            )}
-
-            {selectedWalletType === "Bitcoin" && (
-              <BitcoinWalletLayout address={walletAddress} />
-            )}
-
-            {selectedWalletType === "Ergo" && (
-              <ErgoWalletLayout address={walletAddress} />
-            )}
-          </div>
-
-          <div className="space-y-4">
-            <WalletManager 
-              currentAddress={walletAddress} 
-              onSelectWallet={setWalletAddress}
-              savedWallets={savedWallets}
-              onAddWallet={addWallet}
-              onRemoveWallet={removeWallet}
-              isWalletStale={isWalletStale}
-              onForceRefresh={forceRefreshWallet}
-              isOnline={isOnline}
-              selectedWalletType={selectedWalletType}
-            />
-          </div>
-        </div>
-      </div>
-      
-      {/* Floating Debug Panel - positioned independently */}
-      <FloatingDebugPanel
-        savedWallets={savedWallets}
-        isOnline={isOnline}
-        rateLimitInfo={getRateLimitInfo()}
-        cacheStatus={getCacheStatus()}
-        onForceRefresh={forceRefreshWallet}
-        onRefreshStale={refreshStaleWallets}
-        onCleanupCache={cleanupCache}
-        enabledForPage="wallets"
-      />
->>>>>>> origin/main
     </div>
   );
 };
