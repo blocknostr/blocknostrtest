@@ -303,11 +303,7 @@ export function useUnifiedProfile(
           // Set up subscription for updates if using main service
           if (!activeSubscriptions.current[pubkey] && result.pubkeyHex) {
             const unsubscribe = profileAdapter.subscribeToProfileUpdates(
-<<<<<<< HEAD
-              (updatedPubkey: string, profileData: any) => {
-=======
               (updatedPubkey: string, profileData: import('@/lib/services/profile/types').ProfileData) => {
->>>>>>> origin/main
                 if (updatedPubkey === result.pubkeyHex && profileData.metadata) {
                   console.log(`[useUnifiedProfile] Profile update received for ${pubkey.substring(0, 8)}`);
                   setBatchState(prev => ({

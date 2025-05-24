@@ -8,21 +8,12 @@ interface RateLimitConfig {
   maxBackoffMs: number;
 }
 
-<<<<<<< HEAD
 // Relaxed rate limits (more reasonable for multiple wallets)
 const DEFAULT_RATE_LIMITS: Record<string, RateLimitConfig> = {
   balance: { maxRequests: 20, windowMs: 60000, backoffMs: 500, maxBackoffMs: 10000 },
   utxos: { maxRequests: 15, windowMs: 60000, backoffMs: 500, maxBackoffMs: 15000 },
   transactions: { maxRequests: 10, windowMs: 60000, backoffMs: 1000, maxBackoffMs: 20000 },
   tokens: { maxRequests: 15, windowMs: 60000, backoffMs: 500, maxBackoffMs: 15000 },
-=======
-// Default rate limits (conservative to avoid 429s)
-const DEFAULT_RATE_LIMITS: Record<string, RateLimitConfig> = {
-  balance: { maxRequests: 5, windowMs: 60000, backoffMs: 1000, maxBackoffMs: 30000 },
-  utxos: { maxRequests: 3, windowMs: 60000, backoffMs: 2000, maxBackoffMs: 60000 },
-  transactions: { maxRequests: 2, windowMs: 60000, backoffMs: 3000, maxBackoffMs: 90000 },
-  tokens: { maxRequests: 3, windowMs: 60000, backoffMs: 2000, maxBackoffMs: 60000 },
->>>>>>> origin/main
 };
 
 // Request tracking
@@ -48,7 +39,6 @@ const apiCache = new Map<string, CachedResponse<any>>();
 // Request deduplication
 const pendingRequests = new Map<string, Promise<any>>();
 
-<<<<<<< HEAD
 // Add this new variable at the top level
 let rateLimitingEnabled = true;
 
@@ -58,18 +48,13 @@ export function disableRateLimiting(disabled: boolean = true) {
   console.log(`[RateLimit] Rate limiting ${rateLimitingEnabled ? 'enabled' : 'disabled'}`);
 }
 
-=======
->>>>>>> origin/main
 /**
  * Check if we can make a request based on rate limits
  */
 function canMakeRequest(endpoint: string): boolean {
-<<<<<<< HEAD
   // Allow all requests if rate limiting is disabled
   if (!rateLimitingEnabled) return true;
   
-=======
->>>>>>> origin/main
   const config = DEFAULT_RATE_LIMITS[endpoint];
   if (!config) return true;
 
@@ -287,7 +272,6 @@ export function shouldRefreshWallet(wallet: SavedWallet): boolean {
   }
   
   return isExpired || isStale;
-<<<<<<< HEAD
 }
 
 /**
@@ -319,6 +303,4 @@ if (typeof window !== 'undefined') {
   (window as any).debugRateLimits = debugRateLimits;
   (window as any).disableRateLimiting = disableRateLimiting;
   (window as any).clearRateLimitState = clearRateLimitState;
-=======
->>>>>>> origin/main
 } 
