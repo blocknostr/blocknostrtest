@@ -1,0 +1,546 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 211 100% 50%; /* Facebook Messenger blue */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Theme change variables */
+    --theme-change-x: 50%;
+    --theme-change-y: 50%;
+    
+    /* Custom scrollbar colors */
+    --scrollbar-thumb: 215 20% 65%; 
+    --scrollbar-track: 210 20% 98%;
+
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    /* Updated dark mode theme with black, gray, and white tones */
+    --background: 0 0% 7%; /* Near black */
+    --foreground: 0 0% 95%; /* Off-white */
+
+    --card: 0 0% 10%; /* Dark gray */
+    --card-foreground: 0 0% 95%; /* Off-white */
+
+    --popover: 0 0% 10%; /* Dark gray */
+    --popover-foreground: 0 0% 95%; /* Off-white */
+
+    --primary: 211 100% 50%; /* Facebook Messenger blue */
+    --primary-foreground: 0 0% 100%; /* White */
+
+    --secondary: 0 0% 15%; /* Gray */
+    --secondary-foreground: 0 0% 95%; /* Off-white */
+
+    --muted: 0 0% 20%; /* Medium gray */
+    --muted-foreground: 0 0% 70%; /* Light gray */
+
+    --accent: 0 0% 25%; /* Gray */
+    --accent-foreground: 0 0% 95%; /* Off-white */
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 95%; /* Off-white */
+
+    --border: 0 0% 20%; /* Medium gray */
+    --input: 0 0% 20%; /* Medium gray */
+    --ring: 0 0% 70%; /* Light gray */
+    
+    /* Sidebar related colors */
+    --sidebar-background: 0 0% 10%; /* Dark gray */
+    --sidebar-foreground: 0 0% 90%; /* Light gray */
+    --sidebar-primary: 0 0% 95%; /* Off-white */
+    --sidebar-primary-foreground: 0 0% 7%; /* Near black */
+    --sidebar-accent: 0 0% 15%; /* Gray */
+    --sidebar-accent-foreground: 0 0% 90%; /* Light gray */
+    --sidebar-border: 0 0% 20%; /* Medium gray */
+    --sidebar-ring: 0 0% 40%; /* Gray */
+    
+    /* Custom scrollbar colors for dark mode */
+    --scrollbar-thumb: 215 20% 50%;
+    --scrollbar-track: 215 20% 15%;
+
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+  
+  /* Smooth scrolling for whole page */
+  html {
+    scroll-behavior: smooth;
+    height: -webkit-fill-available;
+    height: 100%;
+  }
+  
+  /* Support for iOS height */
+  body {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
+    /* Use custom viewport height variable */
+    min-height: calc(var(--vh, 1vh) * 100);
+  }
+  
+  /* Fix iOS text size adjustment issues */
+  input, textarea, button, select {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+  }
+  
+  /* Remove iOS default button styles */
+  button {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+}
+
+/* Theme transition classes - updated with shorter duration */
+.color-theme-in-transition,
+.color-theme-in-transition *,
+.color-theme-in-transition *:before,
+.color-theme-in-transition *:after {
+  transition: all 1s ease-out !important;
+  transition-delay: 0 !important;
+}
+
+/* Radial effect for theme transition */
+html.color-theme-in-transition {
+  background-image: radial-gradient(
+    circle at var(--theme-change-x) var(--theme-change-y),
+    hsl(var(--background)) 0%,
+    hsl(var(--background)) 10%,
+    transparent 70%
+  );
+  background-position: center;
+  background-size: 300% 300%;
+  background-repeat: no-repeat;
+  animation: theme-ripple 1s ease-out forwards;
+}
+
+@keyframes theme-ripple {
+  0% {
+    background-size: 0% 0%;
+  }
+  100% {
+    background-size: 300% 300%;
+  }
+}
+
+/* Mobile optimizations */
+@layer utilities {
+  .touch-action-none {
+    touch-action: none;
+  }
+  
+  /* FB Messenger style message animations */
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out forwards;
+  }
+  
+  .message-bubble {
+    @apply relative transition-all duration-200;
+  }
+  
+  /* Original message bubbles with points */
+  .message-bubble-sent {
+    @apply bg-primary text-primary-foreground rounded-2xl rounded-tr-sm;
+    position: relative;
+  }
+  
+  .message-bubble-sent:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -6px;
+    width: 10px;
+    height: 10px;
+    background: hsl(var(--primary));
+    border-radius: 0 0 0 10px;
+    clip-path: polygon(0 0, 0% 100%, 100% 0);
+  }
+  
+  .message-bubble-received {
+    @apply bg-muted rounded-2xl rounded-tl-sm;
+    position: relative;
+  }
+  
+  .message-bubble-received:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -6px;
+    width: 10px;
+    height: 10px;
+    background: hsl(var(--muted) / 0.8);
+    border-radius: 0 0 10px 0;
+    clip-path: polygon(100% 0, 0 0, 100% 100%);
+  }
+  
+  /* New message bubbles without points */
+  .message-bubble-sent-no-point {
+    @apply bg-primary text-primary-foreground rounded-2xl;
+    position: relative;
+  }
+  
+  .message-bubble-received-no-point {
+    @apply bg-muted/80 rounded-2xl;
+    position: relative;
+  }
+  
+  /* Fixed tab bar styles */
+  .fixed-tab-bar {
+    @apply sticky top-14 z-20 bg-background/80 backdrop-blur-md transition-shadow;
+  }
+  
+  .scrolled .fixed-tab-bar {
+    @apply shadow-md;
+  }
+  
+  /* Custom scrollbar styles for browsers that support it (mainly webkit) */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 12px; /* Increased from 8px to 12px for better visibility */
+    height: 12px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: hsl(var(--scrollbar-track));
+    border-radius: 4px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: hsl(var(--scrollbar-thumb));
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    min-height: 40px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary));
+    background-clip: padding-box;
+  }
+  
+  /* Make radix scrollbar more visible */
+  [data-radix-scroll-area-scrollbar-thumb] {
+    background-color: hsl(var(--scrollbar-thumb)) !important;
+    min-height: 40px;
+    min-width: 12px; /* Ensure horizontal scrollbars are also visible */
+  }
+  
+  [data-radix-scroll-area-scrollbar]:hover [data-radix-scroll-area-scrollbar-thumb] {
+    background-color: hsl(var(--primary)) !important;
+  }
+  
+  /* Ensure Radix ScrollArea scrollbar is always visible when type="always" */
+  [data-radix-scroll-area-scrollbar][data-state="visible"] {
+    opacity: 1 !important;
+  }
+  
+  /* Freeze feed when loading to prevent scroll jumps */
+  .feed-loading {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+  
+  .feed-loading::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.05);
+    -webkit-backdrop-filter: blur(1px);
+    backdrop-filter: blur(1px);
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-out;
+  }
+  
+  .feed-loading.active::after {
+    opacity: 1;
+  }
+  
+  /* Transition for scroll locking */
+  .scroll-lock-transition {
+    transition: opacity 0.3s ease-out; 
+  }
+
+  /* Custom scrollbar styles for virtualized feed */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(156 163 175) rgb(243 244 246);
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: rgb(243 244 246);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(156 163 175);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgb(107 114 128);
+  }
+  
+  .dark .scrollbar-thin {
+    scrollbar-color: rgb(75 85 99) rgb(31 41 55);
+  }
+  
+  .dark .scrollbar-thin::-webkit-scrollbar-track {
+    background: rgb(31 41 55);
+  }
+  
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(75 85 99);
+  }
+  
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgb(107 114 128);
+  }
+
+  /* Hide scrollbars for react-window virtualized lists */
+  .react-window-list {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+  }
+  
+  .react-window-list::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Webkit */
+  }
+
+  /* Hide scrollbar completely while keeping scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Safari and Chrome */
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure proper tap targets on mobile */
+@media (max-width: 768px) {
+  button, 
+  a,
+  [role="button"],
+  input[type="checkbox"],
+  input[type="radio"] {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  .card {
+    @apply mx-auto max-w-[95%];
+  }
+  
+  /* iOS-specific padding classes */
+  .ios-safe-padding-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  
+  .ios-safe-padding-top {
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+  
+  .px-safe {
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+  
+  /* Fixed headers for iOS to prevent bounce issues */
+  .fixed-header {
+    @apply sticky top-0 z-50 backdrop-blur-md;
+    transform: translateZ(0);
+  }
+  
+  /* Allow smaller heights for specific UI elements that need it */
+  .h-auto,
+  .min-h-auto,
+  button.h-auto,
+  button.min-h-auto {
+    min-height: auto;
+  }
+}
+
+/* Improve swipe gesture detection */
+.sheet-open {
+  overflow: hidden;
+}
+
+/* Ensure the content area fills available space */
+.app-content {
+  @apply flex-1 min-h-screen w-full;
+}
+
+/* Theme toggle button styles */
+.theme-toggle-button {
+  position: relative;
+  z-index: 10;
+}
+
+/* Facebook Messenger specific styles */
+.fb-message-transition {
+  transition: all 0.2s ease;
+}
+
+.contact-item {
+  @apply transition-colors duration-200 hover:bg-accent/30 rounded-md;
+}
+
+.contact-item-active {
+  @apply bg-accent;
+}
+
+.messenger-shadow {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.message-input {
+  @apply rounded-full bg-muted/30 focus-within:ring-1 focus-within:ring-primary/50;
+}
+
+.online-indicator {
+  @apply absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-background;
+}
+
+/* World Chat specific styles */
+.chat-card {
+  transition: all 0.2s ease;
+  background: var(--background);
+  /* Create more separation from the feed */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.chat-container {
+  /* Increase container separation from other sidebar elements */
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Dark mode adjustments */
+.dark .chat-card {
+  background: hsl(var(--muted)/0.2);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);
+  border-color: hsl(var(--border)/0.2);
+}
+
+.dark .chat-container {
+  background: hsl(var(--muted)/0.1);
+}
+
+/* Improved scrollbar styling for chat */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* iOS specific optimizations */
+.ios-safe-area {
+  height: 100%;
+  height: calc(var(--vh, 1vh) * 100);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.overscroll-none {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.touch-target {
+  @apply min-h-[44px] min-w-[44px];
+}
