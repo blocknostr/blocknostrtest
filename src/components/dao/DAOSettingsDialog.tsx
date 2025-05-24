@@ -12,6 +12,8 @@ import { DAO } from "@/types/dao";
 import { toast } from "@/lib/utils/toast-replacement";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { nostrService } from "@/lib/nostr";
+import { useUnifiedProfile } from '@/hooks/useUnifiedProfile';
+import { ProfileMetadata } from '@/lib/adapters/ProfileAdapter';
 
 interface DAOSettingsDialogProps {
   dao: DAO;
@@ -399,6 +401,7 @@ const DAOSettingsDialog: React.FC<DAOSettingsDialogProps> = ({
 };
 
 // Helper component for displaying moderator info
+
 const ModeratorItem = ({ 
   pubkey, 
   onRemove,
@@ -408,23 +411,25 @@ const ModeratorItem = ({
   onRemove: () => void;
   isRemoving: boolean;
 }) => {
-  const [profile, setProfile] = useState<any>(null);
-  
+  // Use unified profile system (batch mode)
+  const [batchState, batchActions] = useUnifiedProfile(undefined, { mode: 'batch' });
+  const [profile, setProfile] = useState<ProfileMetadata | null>(null);
+
   React.useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const userProfile = await nostrService.getUserProfile(pubkey);
-        setProfile(userProfile);
-      } catch (error) {
-        console.error("Error fetching moderator profile:", error);
-      }
-    };
-    
-    fetchProfile();
-  }, [pubkey]);
-  
-  const displayName = profile?.name || profile?.displayName || pubkey.substring(0, 8);
-  
+    let isMounted = true;
+    // Type guard for batchActions
+    if ('fetchProfile' in batchActions) {
+      (batchActions as import('@/hooks/useUnifiedProfile').BatchProfileActions)
+        .fetchProfile(pubkey)
+        .then((p) => {
+          if (isMounted) setProfile(p);
+        });
+    }
+    return () => { isMounted = false; };
+  }, [pubkey, batchActions]);
+
+  const displayName = profile?.name || profile?.display_name || pubkey.substring(0, 8);
+
   return (
     <div className="flex items-center justify-between p-2 rounded-md bg-muted/50">
       <div className="flex items-center gap-2">
@@ -442,6 +447,7 @@ const ModeratorItem = ({
         size="sm"
         onClick={onRemove}
         disabled={isRemoving}
+        title="Remove moderator"
       >
         <X className="h-4 w-4 text-destructive" />
       </Button>

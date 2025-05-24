@@ -220,13 +220,13 @@ export function useUnifiedProfile(
         error: null
       }));
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (abortControllerRef.current?.signal.aborted) {
         if (mode !== 'basic') addDebugInfo('Request aborted by user');
         return;
       }
 
-      const errorMessage = error.message || 'Failed to load profile';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load profile';
       if (mode !== 'basic') addDebugInfo(`Error: ${errorMessage}`);
       console.error('[useUnifiedProfile] Error loading profile:', error);
 
@@ -303,7 +303,7 @@ export function useUnifiedProfile(
           // Set up subscription for updates if using main service
           if (!activeSubscriptions.current[pubkey] && result.pubkeyHex) {
             const unsubscribe = profileAdapter.subscribeToProfileUpdates(
-              (updatedPubkey: string, profileData: any) => {
+              (updatedPubkey: string, profileData: import('@/lib/services/profile/types').ProfileData) => {
                 if (updatedPubkey === result.pubkeyHex && profileData.metadata) {
                   console.log(`[useUnifiedProfile] Profile update received for ${pubkey.substring(0, 8)}`);
                   setBatchState(prev => ({
@@ -347,11 +347,11 @@ export function useUnifiedProfile(
         }));
         return null;
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(`[useUnifiedProfile] Error fetching profile for ${pubkey.substring(0, 8)}:`, error);
       setBatchState(prev => ({
         ...prev,
-        errors: { ...prev.errors, [pubkey]: error.message || "Unknown error" }
+        errors: { ...prev.errors, [pubkey]: error instanceof Error ? error.message : "Unknown error" }
       }));
       return null;
     } finally {
@@ -536,7 +536,7 @@ export function useUnifiedProfile(
     if (mode === 'batch' || mode === 'cache' || service === 'chat') return;
     
     const unsubscribeProfileUpdates = profileAdapter.subscribeToProfileUpdates(
-      (pubkey: string, profileData: any) => {
+      (pubkey: string, profileData: import('@/lib/services/profile/types').ProfileData) => {
         setSingleState(prev => {
           // Only update if this is for the current profile being viewed
           if (pubkey === prev.pubkeyHex && profileData.metadata) {
@@ -552,7 +552,7 @@ export function useUnifiedProfile(
     );
 
     const unsubscribeLoadingChanges = profileAdapter.subscribeToLoadingStateChanges(
-      (pubkey: string, loadingState: any) => {
+      (pubkey: string, loadingState: import('@/lib/services/profile/types').ProfileLoadingState) => {
         setSingleState(prev => {
           // Only log if this is for the current profile being viewed
           if (pubkey === prev.pubkeyHex && mode !== 'basic') {
@@ -642,4 +642,4 @@ export function useChatProfile(options?: Omit<UseUnifiedProfileOptions, 'mode' |
  */
 export function useFeedProfile(options?: Omit<UseUnifiedProfileOptions, 'mode'>) {
   return useUnifiedProfile(undefined, { ...options, mode: 'batch' });
-} 
+}

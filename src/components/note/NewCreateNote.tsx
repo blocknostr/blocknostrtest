@@ -9,6 +9,7 @@ import { Send, X, Calendar, Image, Smile, FileText, Settings } from 'lucide-reac
 import { cn } from '@/lib/utils';
 import { useNoteFormState } from '@/hooks/useNoteFormState';
 import { useNoteSubmission } from '@/hooks/useNoteSubmission';
+import { useUnifiedProfile, ProfileState } from '@/hooks/useUnifiedProfile';
 
 // Enhanced interface with optional advanced features
 interface UnifiedCreateNoteProps {
@@ -54,9 +55,21 @@ const UnifiedCreateNote: React.FC<UnifiedCreateNoteProps> = ({
   const { isSubmitting, submitNote } = useNoteSubmission();
 
   // Local state for UI behavior
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<import('@/lib/adapters/ProfileAdapter').ProfileMetadata | null>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(showAdvancedFeatures);
+
+  // Get user's public key
+  const pubkey = nostrService.publicKey;
+
+  // Use unified profile system for current user
+  const [profileState] = useUnifiedProfile(pubkey, { mode: 'single' });
+
+  useEffect(() => {
+    if ((profileState as ProfileState).profile) {
+      setProfile((profileState as ProfileState).profile ?? null);
+    }
+  }, [profileState]);
 
   // Use custom max length or default
   const effectiveMaxLength = maxLength || defaultMaxLength;
@@ -65,9 +78,6 @@ const UnifiedCreateNote: React.FC<UnifiedCreateNoteProps> = ({
   const charsLeft = effectiveMaxLength - content.length;
   const isNearLimit = charsLeft <= 20 && charsLeft > 0;
   const isOverLimit = charsLeft < 0;
-  
-  // Get user's public key
-  const pubkey = nostrService.publicKey;
   
   // Auto resize textarea
   useEffect(() => {
@@ -81,29 +91,14 @@ const UnifiedCreateNote: React.FC<UnifiedCreateNoteProps> = ({
       textarea.scrollHeight
     );
     textarea.style.height = `${newHeight}px`;
-  }, [content, variant]);
+  }, [content, variant, textareaRef]);
 
   // Auto focus for modal variant
   useEffect(() => {
     if ((autoFocus || variant === 'modal') && textareaRef.current) {
       textareaRef.current.focus();
     }
-  }, [autoFocus, variant]);
-  
-  // Fetch user profile for avatar
-  useEffect(() => {
-    if (pubkey) {
-      nostrService.getUserProfile(pubkey)
-        .then(profile => {
-          if (profile) {
-            setProfile(profile);
-          }
-        })
-        .catch(err => {
-          console.warn("Could not fetch profile", err);
-        });
-    }
-  }, [pubkey]);
+  }, [autoFocus, variant, textareaRef]);
   
   // Extract hashtags from content (enhanced from SimpleNoteForm)
   const extractHashtags = (text: string): string[] => {
